@@ -1,11 +1,26 @@
 from flask import Flask, request, jsonify
 import logging
+import os
 
 app = Flask(__name__)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
+
+@app.route('/')
+def index():
+    text = 'Webhooks service is running! 11'
+    # Prepare response content
+    if os.path.exists("webhook.log"):
+        with open("webhook.log", 'r') as file:
+            log_content = file.read()
+        response_content = f"{text}\n\n{log_content}"
+        return Response(response_content, mimetype='text/plain')
+    else:
+        response_content = f"{text}\n\nLog file does not exist."
+        return Response(response_content, mimetype='text/plain', status=404)
+
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
